@@ -16,7 +16,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       # Data lives on the gh-pages branch so copies of this template start with a clean history
       - name: Check out data branch
         run: |
