@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GitHub Downloads</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f6f6f4; --card: #ffffff; --raised: #fcfcfb; --border: #e4e3df; --grid: #ecebe7; --hover: #f1f0ec;
+    --text: #0b0b0b; --text-2: #52514e; --muted: #7a7974;
+    --accent: #2a78d6; --accent-soft: rgb(42 120 214 / .12); --up: #1f7a3d; --up-soft: rgb(31 122 61 / .1);
+    --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300; --s7: #6250d6; --other: #9a9893;
+    --shadow: 0 1px 2px rgb(0 0 0 / .04), 0 4px 16px rgb(0 0 0 / .05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --bg: #141413; --card: #1d1d1c; --raised: #222220; --border: #33332f; --grid: #2a2a28; --hover: #262624;
+      --text: #f0efec; --text-2: #c3c2b7; --muted: #8f8e86;
+      --accent: #3987e5; --accent-soft: rgb(57 135 229 / .18); --up: #5cc27f; --up-soft: rgb(92 194 127 / .12);
+      --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9; --other: #77766f;
+      --shadow: 0 1px 2px rgb(0 0 0 / .3), 0 4px 16px rgb(0 0 0 / .25);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #141413; --card: #1d1d1c; --raised: #222220; --border: #33332f; --grid: #2a2a28; --hover: #262624;
+    --text: #f0efec; --text-2: #c3c2b7; --muted: #8f8e86;
+    --accent: #3987e5; --accent-soft: rgb(57 135 229 / .18); --up: #5cc27f; --up-soft: rgb(92 194 127 / .12);
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9; --other: #77766f;
+    --shadow: 0 1px 2px rgb(0 0 0 / .3), 0 4px 16px rgb(0 0 0 / .25);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+  main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 56px; }
+  a { color: inherit; }
+  button, input, select { font: inherit; color: inherit; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  header img { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--border); background: var(--card); }
+  header h1 { font-size: 19px; font-weight: 650; margin: 0; letter-spacing: -.01em; }
+  header h1 a { text-decoration: none; }
+  header h1 a:hover { text-decoration: underline; }
+  .status { color: var(--muted); font-size: 13px; display: flex; align-items: center; gap: 6px; }
+  .live { width: 7px; height: 7px; border-radius: 50%; background: var(--up); box-shadow: 0 0 0 3px var(--up-soft); }
+  .icon-btn { margin-left: auto; width: 36px; height: 36px; border-radius: 9px; border: 1px solid var(--border);
+    background: var(--card); cursor: pointer; display: grid; place-items: center; }
+  .icon-btn:hover { background: var(--hover); }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 820px) { .tiles { grid-template-columns: repeat(2, 1fr); } }
+  .tile, .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
+  .tile { padding: 14px 16px; min-width: 0; }
+  .tile .label { color: var(--text-2); font-size: 13px; }
+  .tile .value { font-size: 30px; font-weight: 700; letter-spacing: -.02em; line-height: 1.2; margin-top: 2px; }
+  .tile .value.up { color: var(--up); }
+  .tile .foot { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .bar { height: 6px; border-radius: 3px; background: var(--grid); overflow: hidden; margin-top: 8px; }
+  .bar > i { display: block; height: 100%; border-radius: 3px; background: var(--accent); }
+
+  .card { padding: 16px; margin-bottom: 16px; }
+  .card-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .card-head h2 { font-size: 15px; font-weight: 650; margin: 0 auto 0 0; }
+  .seg { display: inline-flex; background: var(--bg); border: 1px solid var(--border); border-radius: 9px; padding: 2px; }
+  .seg button { border: 0; background: none; padding: 5px 11px; border-radius: 7px; cursor: pointer; color: var(--text-2); font-size: 13px; }
+  .seg button:hover { color: var(--text); }
+  .seg button[aria-pressed="true"] { background: var(--card); color: var(--text); box-shadow: 0 1px 2px rgb(0 0 0 / .12); font-weight: 600; }
+  .focus-chip { display: none; align-items: center; gap: 6px; font-size: 13px; padding: 4px 6px 4px 10px; border-radius: 99px;
+    background: var(--accent-soft); }
+  .focus-chip button { border: 0; background: none; cursor: pointer; padding: 0 4px; font-size: 15px; line-height: 1; color: var(--text-2); }
+
+  .chart { position: relative; touch-action: pan-y; }
+  .chart svg { display: block; width: 100%; height: 300px; overflow: visible; }
+  .axis { fill: var(--muted); font-size: 11px; }
+  .tip { position: absolute; pointer-events: none; background: var(--raised); border: 1px solid var(--border); border-radius: 10px;
+    padding: 8px 10px; font-size: 12px; box-shadow: var(--shadow); display: none; min-width: 150px; z-index: 2; }
+  .tip .when { color: var(--muted); margin-bottom: 4px; }
+  .tip .row { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .tip .row b { margin-left: auto; padding-left: 12px; font-variant-numeric: tabular-nums; }
+  .tip .row s { text-decoration: none; color: var(--up); font-variant-numeric: tabular-nums; min-width: 34px; text-align: right; }
+  .sw { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .legend button { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); background: var(--card);
+    border-radius: 99px; padding: 3px 10px 3px 8px; font-size: 12px; cursor: pointer; }
+  .legend button:hover { background: var(--hover); }
+  .legend button[aria-pressed="false"] { opacity: .45; }
+  .legend button[aria-pressed="false"] .sw { background: transparent !important; outline: 1.5px solid var(--muted); outline-offset: -1.5px; }
+  .empty { color: var(--muted); text-align: center; padding: 100px 0; }
+
+  .tools { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tools input { width: 180px; max-width: 100%; padding: 6px 10px; border: 1px solid var(--border); border-radius: 9px; background: var(--bg); }
+  .repos { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  @media (max-width: 520px) { .repos { grid-template-columns: minmax(0, 1fr); } }
+  .repo { min-width: 0; border: 1px solid var(--border); border-radius: 12px; background: var(--raised); transition: border-color .15s, box-shadow .15s; }
+  .repo:hover { border-color: var(--muted); }
+  .repo.open { grid-column: 1 / -1; box-shadow: var(--shadow); }
+  .repo > button { all: unset; box-sizing: border-box; display: block; width: 100%; padding: 14px; cursor: pointer; border-radius: 12px; }
+  .repo > button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .repo .top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .repo .name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .repo .chev { margin-left: auto; color: var(--muted); transition: transform .2s; flex: none; }
+  .repo.open .chev { transform: rotate(180deg); }
+  .repo .mid { display: flex; align-items: end; gap: 10px; margin-top: 8px; }
+  .repo .total { font-size: 24px; font-weight: 700; letter-spacing: -.02em; line-height: 1; }
+  .badge { font-size: 12px; font-weight: 600; padding: 2px 7px; border-radius: 99px; background: var(--grid); color: var(--muted); white-space: nowrap; }
+  .badge.up { background: var(--up-soft); color: var(--up); }
+  .repo .spark { margin-left: auto; width: 110px; height: 34px; flex: none; }
+  .repo .share { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-top: 10px; }
+  .detail { display: none; padding: 0 14px 14px; }
+  .repo.open .detail { display: block; }
+  .detail-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 12px; }
+  .btn { border: 1px solid var(--border); background: var(--card); border-radius: 8px; padding: 5px 11px; font-size: 13px; cursor: pointer; text-decoration: none; }
+  .btn:hover { background: var(--hover); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 7px 6px; text-align: right; border-bottom: 1px solid var(--grid); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--text-2); font-weight: 500; }
+  td .files { color: var(--muted); font-size: 12px; }
+  .note { color: var(--muted); font-size: 12px; margin-top: 8px; }
+  footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 24px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+  /* ---- app chrome ---- */
+  .actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+  .actions .icon-btn { margin-left: 0; }
+  .primary { display: inline-flex; align-items: center; gap: 7px; border: 0; border-radius: 9px; padding: 8px 14px; cursor: pointer;
+    background: var(--accent); color: #fff; font-weight: 600; font-size: 14px; white-space: nowrap; }
+  @media (max-width: 560px) { #check span { display: none; } header h1 .src { display: none; } }
+  .primary:hover { filter: brightness(1.08); }
+  .primary:disabled { opacity: .6; cursor: default; }
+  .primary svg { width: 16px; height: 16px; }
+  .spin { animation: spin .9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .src { font-size: 12px; padding: 1px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--text-2); }
+  .banner { display: none; margin-bottom: 16px; padding: 10px 14px; border-radius: 10px; font-size: 14px;
+    background: rgb(227 73 72 / .1); border: 1px solid rgb(227 73 72 / .35); }
+  .banner.info { background: var(--accent-soft); border-color: var(--border); }
+  #setup { display: none; min-height: 100vh; place-items: center; padding: 24px 16px; }
+  #setup .card { width: min(420px, 100%); padding: 28px; text-align: center; }
+  #setup h1 { font-size: 22px; margin: 12px 0 6px; }
+  #setup p { color: var(--text-2); margin: 0 0 20px; }
+  .logo { width: 56px; height: 56px; }
+  .field { display: block; text-align: left; margin-bottom: 14px; font-size: 13px; color: var(--text-2); }
+  .field input { display: block; width: 100%; margin-top: 5px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 9px;
+    background: var(--bg); font-size: 15px; }
+  .field input:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+  .field small { display: block; color: var(--muted); margin-top: 4px; }
+  .err { color: #e34948; font-size: 13px; min-height: 18px; margin: -4px 0 10px; text-align: left; }
+  .wide { width: 100%; justify-content: center; }
+  dialog { border: 1px solid var(--border); border-radius: 14px; background: var(--card); color: var(--text); padding: 22px;
+    width: min(440px, calc(100% - 32px)); box-shadow: var(--shadow); }
+  dialog::backdrop { background: rgb(0 0 0 / .4); }
+  dialog h2 { margin: 0 0 16px; font-size: 17px; }
+  .check-row { display: flex; gap: 8px; align-items: center; font-size: 14px; margin: 4px 0 14px; cursor: pointer; }
+  .check-row input { width: 16px; height: 16px; accent-color: var(--accent); }
+  .row-end { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div id="setup">
+  <form class="card" id="setup-form">
+    <svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="var(--accent)"/><path d="M32 14v26m0 0-10-10m10 10 10-10M18 48h28" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h1>GitHub Downloads</h1>
+    <p>Track the lifetime download count of every release you've published, even after you re-upload files.</p>
+    <label class="field">GitHub username<input id="setup-user" autocomplete="username" spellcheck="false" required placeholder="octocat"></label>
+    <div class="err" id="setup-err"></div>
+    <button class="primary wide" id="setup-go">Start tracking</button>
+  </form>
+</div>
+
+<dialog id="settings">
+  <form method="dialog" id="settings-form">
+    <h2>Settings</h2>
+    <label class="field">GitHub username<input id="set-user" spellcheck="false" required></label>
+    <label class="field">Cloud tracker repo<input id="set-repo" spellcheck="false" placeholder="github-download-tracker">
+      <small>If you set up the tracker template on GitHub, history comes from its gh-pages branch and keeps updating while your PC is off.</small></label>
+    <label class="field">GitHub token (optional)<input id="set-token" type="password" autocomplete="off" spellcheck="false">
+      <small>Only needed if you check very often: raises GitHub's limit from 60 to 5,000 requests an hour. No scopes required. Stored on this PC only.</small></label>
+    <label class="check-row" id="autostart-row"><input type="checkbox" id="set-autostart"> Start with Windows (runs in the system tray)</label>
+    <div class="row-end"><button class="btn" value="cancel" formnovalidate>Cancel</button><button class="primary" value="save">Save</button></div>
+  </form>
+</dialog>
+
+<main id="app" hidden>
+  <header>
+    <img id="avatar" alt="">
+    <div>
+      <h1><a id="user-link"></a> · downloads <span class="src" id="src"></span></h1>
+      <div class="status"><span class="live"></span><span id="updated"></span></div>
+    </div>
+    <div class="actions">
+      <button class="primary" id="check" title="Fetch live counts from GitHub now">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 4v5h-5"/></svg><span>Check now</span></button>
+      <button class="icon-btn" id="open-settings" aria-label="Settings" title="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+      <button class="icon-btn" id="theme" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </header>
+  <div class="banner" id="banner"></div>
+
+  <div class="tiles">
+    <div class="tile"><div class="label">Lifetime downloads</div><div class="value num" id="k-total"></div><div class="foot" id="k-total-foot"></div></div>
+    <div class="tile"><div class="label">Last 24 hours</div><div class="value num up" id="k-day"></div><div class="foot" id="k-day-foot"></div></div>
+    <div class="tile"><div class="label" id="k-week-label">Last 7 days</div><div class="value num up" id="k-week"></div><div class="foot" id="k-week-foot"></div></div>
+    <div class="tile"><div class="label">Next milestone</div><div class="value num" id="k-goal"></div><div class="bar"><i id="k-goal-bar"></i></div><div class="foot" id="k-goal-foot"></div></div>
+  </div>
+
+  <section class="card">
+    <div class="card-head">
+      <h2 id="chart-title">Downloads</h2>
+      <span class="focus-chip" id="focus-chip"><span class="sw" id="focus-sw"></span><span id="focus-name"></span><button id="focus-clear" aria-label="Show all repos">×</button></span>
+      <div class="seg" id="view" role="group" aria-label="Chart view">
+        <button data-v="total">Total</button><button data-v="repos">By repo</button><button data-v="gain">Gained</button>
+      </div>
+      <div class="seg" id="range" role="group" aria-label="Time range">
+        <button data-v="1">24H</button><button data-v="7">7D</button><button data-v="30">30D</button><button data-v="0">All</button>
+      </div>
+    </div>
+    <div class="chart" id="chart"><svg id="svg" role="img" aria-labelledby="chart-title"></svg><div class="tip" id="tip"></div></div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Repos</h2>
+      <div class="tools">
+        <input id="q" type="search" placeholder="Filter repos…" aria-label="Filter repos">
+        <div class="seg" id="sort" role="group" aria-label="Sort repos">
+          <button data-v="total">Total</button><button data-v="day">24h</button><button data-v="name">A–Z</button>
+        </div>
+      </div>
+    </div>
+    <div class="repos" id="repos"></div>
+  </section>
+
+  <footer id="foot"></footer>
+</main>
+<script>
+// DATA:   [{time (UTC ISO), repo, downloads (lifetime)}], one row per repo per check
+// ASSETS: [{id, repo, release, name, last, banked}], every release file ever seen
+let DATA = [], ASSETS = [], USER = "", MODE = "local";
+
+const $ = id => document.getElementById(id);
+const DAY = 864e5, HOUR = 36e5;
+const fmt = n => Math.round(n).toLocaleString();
+const signed = n => (n > 0 ? "+" : n < 0 ? "−" : "") + fmt(Math.abs(n));
+const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+                set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// ---- settings (this PC only) ----
+const cfg = {
+  get user() { return store.get("user") || ""; }, set user(v) { store.set("user", v); },
+  get repo() { return store.get("repo") || "github-download-tracker"; }, set repo(v) { store.set("repo", v); },
+  get token() { return store.get("token") || ""; }, set token(v) { store.set("token", v); },
+};
+const localKey = k => `local:${USER.toLowerCase()}:${k}`;
+
+// ---- GitHub ----
+class RateLimit extends Error {}
+async function gh(path) {
+  const headers = { Accept: "application/vnd.github+json" };
+  if (cfg.token) headers.Authorization = `Bearer ${cfg.token}`;
+  const res = await fetch("https://api.github.com/" + path, { headers, cache: "no-store" });
+  if ((res.status === 403 || res.status === 429) && res.headers.get("x-ratelimit-remaining") === "0") {
+    const reset = new Date(res.headers.get("x-ratelimit-reset") * 1000);
+    throw new RateLimit(`GitHub's hourly request limit is used up. Try again after ${reset.toLocaleTimeString([], { timeStyle: "short" })}, or add a token in Settings.`);
+  }
+  if (!res.ok) { const e = new Error(`GitHub returned ${res.status} for ${path}`); e.status = res.status; throw e; }
+  return res.json();
+}
+async function ghAll(path) {
+  const out = [];
+  for (let page = 1; ; page++) {
+    const batch = await gh(`${path}${path.includes("?") ? "&" : "?"}per_page=100&page=${page}`);
+    out.push(...batch);
+    if (batch.length < 100) return out;
+  }
+}
+// Current counts straight from GitHub: every release file of every public, non-fork repo
+async function fetchLive(user) {
+  const repos = (await ghAll(`users/${encodeURIComponent(user)}/repos`)).filter(r => !r.fork);
+  const files = [];
+  const queue = [...repos];
+  await Promise.all(Array.from({ length: 6 }, async () => {
+    for (let r; (r = queue.shift());)
+      for (const rel of await ghAll(`repos/${r.full_name}/releases`))
+        for (const a of rel.assets) files.push({ id: String(a.id), repo: r.name, release: rel.tag_name, name: a.name, count: a.download_count });
+  }));
+  return { repos: repos.map(r => r.name), files };
+}
+// Lifetime rule: a file keeps its last count after it's deleted; a count that drops is banked and counting restarts
+function applyLive(assets, live, time) {
+  const byId = new Map(assets.map(a => [a.id, a]));
+  for (const f of live.files) {
+    const e = byId.get(f.id);
+    if (!e) { const n = { id: f.id, repo: f.repo, release: f.release, name: f.name, last: f.count, banked: 0 }; byId.set(f.id, n); assets.push(n); continue; }
+    if (f.count < e.last) e.banked += e.last;
+    e.last = f.count;
+  }
+  return live.repos.map(repo => ({ time, repo,
+    downloads: assets.filter(a => a.repo === repo).reduce((s, a) => s + a.banked + a.last, 0) }));
+}
+
+// ---- data sources ----
+function parseCsv(text) {
+  const rows = []; let row = [], cell = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += c; }
+    else if (c === '"') q = true;
+    else if (c === ",") { row.push(cell); cell = ""; }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && text[i + 1] === "\n") i++; row.push(cell); if (row.some(Boolean)) rows.push(row); row = []; cell = ""; }
+    else cell += c;
+  }
+  row.push(cell); if (row.some(Boolean)) rows.push(row);
+  const [head, ...body] = rows;
+  return body.map(r => Object.fromEntries(head.map((h, i) => [h, r[i]])));
+}
+// The cloud tracker (GitHub Action template) publishes its history on the gh-pages branch
+async function loadCloud() {
+  const base = `https://raw.githubusercontent.com/${encodeURIComponent(USER)}/${encodeURIComponent(cfg.repo)}/gh-pages/`;
+  const [d, a] = await Promise.all(["downloads.csv", "assets.csv"].map(f => fetch(base + f + "?t=" + Date.now(), { cache: "no-store" })));
+  if (!d.ok || !a.ok) return false;
+  DATA = parseCsv(await d.text()).map(r => ({ time: r.time, repo: r.repo, downloads: +r.downloads }));
+  ASSETS = parseCsv(await a.text()).map(r => ({ id: r.id, repo: r.repo, release: r.release, name: r.name, last: +r.last, banked: +r.banked }));
+  return DATA.length > 0;
+}
+function loadLocal() {
+  try { DATA = JSON.parse(store.get(localKey("downloads")) || "[]"); ASSETS = JSON.parse(store.get(localKey("assets")) || "[]"); }
+  catch { DATA = []; ASSETS = []; }
+}
+function saveLocal() { store.set(localKey("downloads"), JSON.stringify(DATA)); store.set(localKey("assets"), JSON.stringify(ASSETS)); }
+
+let liveAt = 0;
+async function load() {
+  let cloud = false;
+  try { cloud = await loadCloud(); } catch {}
+  MODE = cloud ? "cloud" : "local";
+  if (!cloud) loadLocal();
+}
+// Cloud mode: add a live point on top of the hourly history (not saved). Local mode: this is the tracker, so save it.
+async function checkNow() {
+  const btn = $("check"), label = btn.querySelector("span"), icon = btn.querySelector("svg");
+  btn.disabled = true; icon.classList.add("spin"); label.textContent = "Checking…";
+  try {
+    const live = await fetchLive(USER);
+    const time = new Date().toISOString().slice(0, 16) + "Z";
+    if (MODE === "cloud") DATA = DATA.filter(r => !r.live);
+    const rows = applyLive(ASSETS, live, time);
+    if (MODE === "cloud") rows.forEach(r => r.live = true);
+    DATA = DATA.concat(rows);
+    if (MODE === "local") saveLocal();
+    liveAt = Date.now();
+    banner("");
+    render();
+  } catch (e) {
+    banner(e.message || "Couldn't reach GitHub. Check your connection and try again.");
+  } finally {
+    btn.disabled = false; icon.classList.remove("spin"); label.textContent = "Check now";
+  }
+}
+function banner(msg, info) { const b = $("banner"); b.textContent = msg; b.className = "banner" + (info ? " info" : ""); b.style.display = msg ? "block" : "none"; }
+
+// ---- derived from DATA on every render ----
+let snaps, latest, first, repos, total, gainSince;
+const val = (s, repo) => repo ? (s.counts[repo] || 0) : Object.values(s.counts).reduce((a, b) => a + b, 0);
+// latest snapshot at or before t (the first one if t is before tracking began)
+const at = t => { let r = first; for (const s of snaps) { if (s.t <= t) r = s; else break; } return r; };
+const SLOTS = 7;
+// Color follows the repo (by lifetime rank), never the view
+const color = r => repos.indexOf(r) < SLOTS ? `var(--s${repos.indexOf(r) + 1})` : "var(--other)";
+const OTHER = "__other";
+
+const state = {
+  view: store.get("view") || "total",
+  range: +(store.get("range") ?? 7),
+  focus: null,
+  hidden: new Set(),
+  sort: "total", q: "", open: null,
+};
+
+// ---- header + KPIs ----
+const ago = t => { const m = Math.round((Date.now() - t) / 6e4);
+  return m < 1 ? "just now" : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
+const longDate = t => new Date(t).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+function tickUpdated() {
+  if (!latest) return;
+  $("updated").textContent = `Updated ${ago(latest.t)} · ` + (MODE === "cloud" ? "cloud checks hourly, even when this PC is off" : "checks every 20 min while the app runs");
+  $("updated").title = longDate(latest.t);
+}
+setInterval(tickUpdated, 3e4);
+
+// Animates from the value shown last time, so a new check ticks up instead of restarting at 0
+function countUp(el, to, prefix = "") {
+  const from = +(el.dataset.v || 0); el.dataset.v = to;
+  if (reduceMotion || from === to) { el.textContent = prefix + fmt(to); return; }
+  const t0 = performance.now(), dur = 900;
+  const step = now => { const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = prefix + fmt(from + (to - from) * e); if (p < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+function eta(h) { return h < 1 ? "<1 h" : h < 48 ? `${Math.round(h)} h` : `${Math.round(h / 24)} days`; }
+// Milestones: 100s below 1k, 1,000s below 10k, then 5,000s, 10,000s…
+const stepFor = n => n < 1000 ? 100 : n < 10000 ? 1000 : n < 50000 ? 5000 : 10000;
+
+function render() {
+  snaps = [];
+  for (const r of DATA) {
+    let s = snaps[snaps.length - 1];
+    if (!s || s.time !== r.time) snaps.push(s = { time: r.time, t: +new Date(r.time), counts: {}, live: r.live });
+    s.counts[r.repo] = +r.downloads;
+  }
+  latest = snaps[snaps.length - 1]; first = snaps[0];
+  repos = Object.keys(latest.counts).filter(r => latest.counts[r] > 0).sort((a, b) => latest.counts[b] - latest.counts[a]);
+  total = val(latest);
+  gainSince = (ms, repo) => val(latest, repo) - val(at(latest.t - ms), repo);
+
+  $("avatar").src = `https://github.com/${encodeURIComponent(USER)}.png?size=96`;
+  $("user-link").textContent = USER; $("user-link").href = `https://github.com/${encodeURIComponent(USER)}`;
+  $("src").textContent = MODE === "cloud" ? "Cloud tracker" : "This PC";
+  $("src").title = MODE === "cloud" ? `History from ${USER}/${cfg.repo} (gh-pages)` : "History is stored on this PC";
+  tickUpdated();
+
+  countUp($("k-total"), total);
+  $("k-total-foot").textContent = `across ${repos.length} repos with releases`;
+  const d1 = gainSince(DAY), d7 = gainSince(7 * DAY);
+  countUp($("k-day"), d1, "+");
+  $("k-day-foot").textContent = `≈ ${fmt(d1 / 24)} per hour`;
+  countUp($("k-week"), d7, "+");
+  if (latest.t - first.t < 7 * DAY) {
+    $("k-week-label").textContent = "Since tracking began";
+    $("k-week-foot").textContent = new Date(first.t).toLocaleDateString([], { month: "short", day: "numeric" });
+  } else { $("k-week-label").textContent = "Last 7 days"; $("k-week-foot").textContent = `≈ ${fmt(d7 / 7)} per day`; }
+  const goal = Math.floor(total / stepFor(total)) * stepFor(total) + stepFor(total), prevGoal = goal - stepFor(total);
+  $("k-goal").textContent = fmt(goal);
+  $("k-goal-bar").style.width = ((total - prevGoal) / (goal - prevGoal) * 100) + "%";
+  const perHour = d1 / 24 || d7 / (7 * 24);
+  $("k-goal-foot").textContent = `${fmt(goal - total)} to go` + (perHour > 0 ? ` · ~${eta((goal - total) / perHour)} at this pace` : "");
+  $("foot").innerHTML = `Lifetime counts keep downloads of deleted or replaced release files. ${snaps.length.toLocaleString()} checks since ${new Date(first.t).toLocaleDateString()}.` +
+    (MODE === "local" ? ` <a href="https://github.com/josiahg2502-glitch/github-download-tracker">Set up the cloud tracker</a> to keep counting while this PC is off.` : "");
+  draw();
+  renderRepos();
+}
+
+// ---- theme ----
+const savedTheme = store.get("theme");
+if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+$("theme").onclick = () => {
+  const dark = getComputedStyle(document.documentElement).colorScheme === "dark";
+  document.documentElement.dataset.theme = dark ? "light" : "dark";
+  store.set("theme", document.documentElement.dataset.theme);
+};
+
+// ---- segmented controls ----
+function seg(id, key, onChange) {
+  const g = $(id);
+  const sync = () => g.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v == state[key])));
+  g.onclick = e => { const b = e.target.closest("button"); if (!b) return;
+    state[key] = isNaN(+b.dataset.v) ? b.dataset.v : +b.dataset.v; sync(); onChange(); };
+  sync();
+}
+seg("view", "view", () => { store.set("view", state.view); draw(); });
+seg("range", "range", () => { store.set("range", state.range); draw(); renderRepos(); });
+seg("sort", "sort", renderRepos);
+$("q").oninput = e => { state.q = e.target.value.toLowerCase(); renderRepos(); };
+$("focus-clear").onclick = () => setFocus(null);
+function setFocus(r) {
+  state.focus = r;
+  if (r && state.view === "repos") { state.view = "total"; seg("view", "view", () => { store.set("view", state.view); draw(); }); }
+  draw();
+}
+
+// ---- chart ----
+const svg = $("svg"), tip = $("tip"), box = $("chart");
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, attrs, parent = svg) => { const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
+
+function niceScale(lo, hi, n = 4) {
+  if (hi === lo) { hi = lo + 1; lo = Math.max(0, lo - 1); }
+  const raw = (hi - lo) / n, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => s >= raw);
+  return { lo: Math.floor(lo / step) * step, hi: Math.ceil(hi / step) * step, step };
+}
+function timeTicks(t0, t1) {
+  const span = t1 - t0, out = [];
+  const hourSteps = [1, 2, 3, 6, 12], daySteps = [1, 2, 7, 14, 30];
+  let k = hourSteps.find(h => span / (h * HOUR) <= 7);
+  const d = new Date(t0);
+  if (k) {
+    d.setMinutes(0, 0, 0); d.setHours(Math.ceil(d.getHours() / k) * k);
+    for (; +d <= t1; d.setHours(d.getHours() + k)) if (+d >= t0) out.push({ t: +d, label: d.getHours() === 0
+      ? d.toLocaleDateString([], { month: "short", day: "numeric" }) : d.toLocaleTimeString([], { hour: "numeric" }) });
+  } else {
+    k = daySteps.find(n => span / (n * DAY) <= 7) || 60;
+    d.setHours(0, 0, 0, 0); if (+d < t0) d.setDate(d.getDate() + 1);
+    for (; +d <= t1; d.setDate(d.getDate() + k)) out.push({ t: +d, label: d.toLocaleDateString([], { month: "short", day: "numeric" }) });
+  }
+  return out;
+}
+function windowSnaps() {
+  if (!state.range) return snaps;
+  const start = latest.t - state.range * DAY;
+  const inside = snaps.filter(s => s.t >= start), before = at(start);
+  return before.t < start && before !== inside[0] ? [before, ...inside] : inside;
+}
+function seriesFor(view, pts) {
+  if (view === "repos") {
+    const top = repos.slice(0, SLOTS), rest = repos.slice(SLOTS);
+    const list = top.map(r => ({ key: r, label: r, color: color(r), values: pts.map(s => ({ t: s.t, v: val(s, r), s })) }));
+    if (rest.length) list.push({ key: OTHER, label: `Other (${rest.length})`, color: "var(--other)",
+      values: pts.map(s => ({ t: s.t, v: rest.reduce((a, r) => a + val(s, r), 0), s })) });
+    return list;
+  }
+  const r = state.focus;
+  return [{ key: r || "all", label: r || "All repos", color: r ? color(r) : "var(--accent)", values: pts.map(s => ({ t: s.t, v: val(s, r), s })) }];
+}
+
+let hover = null;
+function draw() {
+  const pts = windowSnaps();
+  const chip = $("focus-chip");
+  chip.style.display = state.focus && state.view !== "repos" ? "inline-flex" : "none";
+  if (state.focus) { $("focus-name").textContent = state.focus; $("focus-sw").style.background = color(state.focus); }
+  $("chart-title").textContent = { total: "Lifetime downloads", repos: "Lifetime downloads by repo", gain: "Downloads gained" }[state.view];
+  svg.replaceChildren(); tip.style.display = "none"; hover = null;
+  const W = Math.max(svg.clientWidth, 280), H = 300, L = 46, R = 12, T = 12, B = 26;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  renderLegend();
+  if (pts.length < 2) { el("text", { x: W / 2, y: H / 2, "text-anchor": "middle", class: "axis" }).textContent = "Not enough checks in this range yet"; return; }
+  if (state.view === "gain") return drawBars(pts, W, H, L, R, T, B);
+
+  const series = seriesFor(state.view, pts).filter(s => !state.hidden.has(s.key) || state.view !== "repos");
+  const t0 = pts[0].t, t1 = pts[pts.length - 1].t;
+  const all = series.flatMap(s => s.values.map(p => p.v));
+  if (!all.length) { el("text", { x: W / 2, y: H / 2, "text-anchor": "middle", class: "axis" }).textContent = "All series hidden"; return; }
+  const sc = niceScale(Math.min(...all), Math.max(...all));
+  const x = t => L + (t - t0) / Math.max(t1 - t0, 1) * (W - L - R);
+  const y = v => T + (1 - (v - sc.lo) / (sc.hi - sc.lo)) * (H - T - B);
+  for (let v = sc.lo; v <= sc.hi + 1e-9; v += sc.step) {
+    el("line", { x1: L, x2: W - R, y1: y(v), y2: y(v), stroke: "var(--grid)" });
+    el("text", { x: L - 8, y: y(v) + 4, "text-anchor": "end", class: "axis" }).textContent = fmt(v);
+  }
+  timeTicks(t0, t1).forEach(k => el("text", { x: x(k.t), y: H - 6, "text-anchor": "middle", class: "axis" }).textContent = k.label);
+
+  const line = s => s.values.map((p, i) => (i ? "L" : "M") + x(p.t).toFixed(1) + "," + y(p.v).toFixed(1)).join("");
+  if (series.length === 1) {
+    const defs = el("defs", {}), g = el("linearGradient", { id: "fill", x1: 0, x2: 0, y1: 0, y2: 1 }, defs);
+    el("stop", { offset: "0%", "stop-color": series[0].color, "stop-opacity": .22 }, g);
+    el("stop", { offset: "100%", "stop-color": series[0].color, "stop-opacity": 0 }, g);
+    el("path", { d: line(series[0]) + `L${x(t1)},${H - B}L${x(t0)},${H - B}Z`, fill: "url(#fill)" });
+  }
+  const paths = series.map(s => el("path", { d: line(s), fill: "none", stroke: s.color, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+  if (!reduceMotion) paths.forEach(p => { const len = p.getTotalLength(); p.style.strokeDasharray = len; p.style.strokeDashoffset = len;
+    p.getBoundingClientRect(); p.style.transition = "stroke-dashoffset .7s ease-out"; p.style.strokeDashoffset = 0; });
+  // end dots
+  series.forEach(s => { const p = s.values[s.values.length - 1];
+    el("circle", { cx: x(p.t), cy: y(p.v), r: 3.5, fill: s.color, stroke: "var(--card)", "stroke-width": 2 }); });
+
+  const cross = el("line", { y1: T, y2: H - B, stroke: "var(--muted)", "stroke-dasharray": "3 3", visibility: "hidden" });
+  const dots = series.map(s => el("circle", { r: 4.5, fill: s.color, stroke: "var(--card)", "stroke-width": 2, visibility: "hidden" }));
+  hover = (mx) => {
+    let i = 0; pts.forEach((p, j) => { if (Math.abs(x(p.t) - mx) < Math.abs(x(pts[i].t) - mx)) i = j; });
+    const px = x(pts[i].t);
+    cross.setAttribute("x1", px); cross.setAttribute("x2", px); cross.setAttribute("visibility", "visible");
+    dots.forEach((d, k) => { d.setAttribute("cx", px); d.setAttribute("cy", y(series[k].values[i].v)); d.setAttribute("visibility", "visible"); });
+    const rows = series.map(s => ({ s, v: s.values[i].v, ch: i ? s.values[i].v - s.values[i - 1].v : 0 })).sort((a, b) => b.v - a.v);
+    showTip(px, Math.min(...series.map(s => y(s.values[i].v))), `<div class="when">${longDate(pts[i].t)}</div>` +
+      rows.map(r => `<div class="row"><span class="sw" style="background:${r.s.color}"></span>${esc(r.s.label)}<b>${fmt(r.v)}</b>${i ? `<s>${r.ch ? signed(r.ch) : ""}</s>` : ""}</div>`).join(""), W, H);
+  };
+  svg.onpointerleave = () => { tip.style.display = "none"; cross.setAttribute("visibility", "hidden"); dots.forEach(d => d.setAttribute("visibility", "hidden")); };
+}
+
+function drawBars(pts, W, H, L, R, T, B) {
+  // Hourly buckets for short ranges, daily otherwise (local time)
+  const hourly = state.range && state.range <= 2;
+  const unit = hourly ? HOUR : DAY;
+  const floor = t => { const d = new Date(t); hourly ? d.setMinutes(0, 0, 0) : d.setHours(0, 0, 0, 0); return +d; };
+  const next = t => { const d = new Date(t); hourly ? d.setHours(d.getHours() + 1) : d.setDate(d.getDate() + 1); return +d; };
+  const r = state.focus, buckets = [];
+  for (let b = floor(Math.max(pts[0].t, first.t)); b <= latest.t; b = next(b)) {
+    const end = Math.min(next(b), latest.t + 1), startSnap = at(b - 1), endSnap = at(end - 1);
+    buckets.push({ t: b, end, v: Math.max(0, val(endSnap, r) - val(startSnap, r)), partial: next(b) > latest.t });
+  }
+  const sc = niceScale(0, Math.max(...buckets.map(b => b.v), 1));
+  sc.lo = 0;
+  // Cap bar width so a few days don't become slabs; center the group
+  const bw = Math.min((W - L - R) / buckets.length, 72), gap = Math.min(bw * .3, 18), X0 = L + (W - L - R - bw * buckets.length) / 2;
+  const y = v => T + (1 - v / sc.hi) * (H - T - B);
+  for (let v = 0; v <= sc.hi + 1e-9; v += sc.step) {
+    el("line", { x1: L, x2: W - R, y1: y(v), y2: y(v), stroke: "var(--grid)" });
+    el("text", { x: L - 8, y: y(v) + 4, "text-anchor": "end", class: "axis" }).textContent = fmt(v);
+  }
+  const every = Math.ceil(buckets.length / 7);
+  buckets.forEach((b, i) => { if ((buckets.length - 1 - i) % every) return;
+    el("text", { x: X0 + bw * (i + .5), y: H - 6, "text-anchor": "middle", class: "axis" }).textContent =
+      hourly ? new Date(b.t).toLocaleTimeString([], { hour: "numeric" }) : new Date(b.t).toLocaleDateString([], { month: "short", day: "numeric" }); });
+  const fill = r ? color(r) : "var(--accent)";
+  const rects = buckets.map((b, i) => {
+    const h = Math.max(y(0) - y(b.v), b.v ? 2 : 0), rx = Math.min(4, (bw - gap) / 2);
+    const bx = X0 + bw * i + gap / 2, by = y(0) - h, w = bw - gap;
+    // rounded top, square base
+    const d = h ? `M${bx},${y(0)}V${by + rx}Q${bx},${by} ${bx + rx},${by}H${bx + w - rx}Q${bx + w},${by} ${bx + w},${by + rx}V${y(0)}Z` : "";
+    return el("path", { d, fill, opacity: b.partial ? .55 : 1 });
+  });
+  $("chart-title").textContent = `Downloads gained per ${hourly ? "hour" : "day"}`;
+  hover = mx => {
+    const i = Math.max(0, Math.min(buckets.length - 1, Math.floor((mx - X0) / bw))), b = buckets[i];
+    rects.forEach((p, k) => p.style.opacity = k === i ? 1 : (buckets[k].partial ? .3 : .45));
+    const when = hourly ? `${new Date(b.t).toLocaleString([], { weekday: "short", hour: "numeric" })}`
+                        : new Date(b.t).toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" });
+    showTip(X0 + bw * (i + .5), y(b.v), `<div class="when">${when}${b.partial ? " · so far" : ""}</div>` +
+      `<div class="row"><span class="sw" style="background:${fill}"></span>${esc(r || "All repos")}<b>+${fmt(b.v)}</b></div>`, W, H);
+  };
+  svg.onpointerleave = () => { tip.style.display = "none"; rects.forEach((p, k) => p.style.opacity = buckets[k].partial ? .55 : 1); };
+}
+
+function showTip(px, py, html, W, H) {
+  tip.innerHTML = html; tip.style.display = "block";
+  const r = svg.getBoundingClientRect(), sx = r.width / W, sy = r.height / H;
+  let left = px * sx + 14;
+  if (left + tip.offsetWidth > box.clientWidth) left = px * sx - tip.offsetWidth - 14;
+  tip.style.left = Math.max(0, left) + "px";
+  tip.style.top = Math.max(0, Math.min(py * sy - tip.offsetHeight / 2, r.height - tip.offsetHeight)) + "px";
+}
+svg.onpointermove = e => { if (!hover) return; const r = svg.getBoundingClientRect(); hover((e.clientX - r.left) * svg.viewBox.baseVal.width / r.width); };
+svg.onpointerdown = svg.onpointermove;
+
+function renderLegend() {
+  const lg = $("legend");
+  lg.replaceChildren();
+  if (state.view !== "repos") return;
+  for (const s of seriesFor("repos", [latest])) {
+    const b = document.createElement("button");
+    b.setAttribute("aria-pressed", String(!state.hidden.has(s.key)));
+    b.innerHTML = `<span class="sw" style="background:${s.color}"></span>`;
+    b.append(s.label);
+    b.title = "Click to show/hide · double-click to show only this";
+    b.onclick = () => { state.hidden.has(s.key) ? state.hidden.delete(s.key) : state.hidden.add(s.key); draw(); };
+    b.ondblclick = () => { state.hidden = new Set(seriesFor("repos", [latest]).map(x => x.key).filter(k => k !== s.key)); draw(); };
+    lg.append(b);
+  }
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// ---- repo cards ----
+function spark(r) {
+  const pts = snaps.filter(s => s.t >= latest.t - 7 * DAY), vs = pts.map(s => val(s, r));
+  if (vs.length < 2) return "";
+  const lo = Math.min(...vs), hi = Math.max(...vs, lo + 1), t0 = pts[0].t, t1 = pts[pts.length - 1].t;
+  const d = pts.map((s, i) => (i ? "L" : "M") + ((s.t - t0) / Math.max(t1 - t0, 1) * 106 + 2).toFixed(1) + "," + (30 - (vs[i] - lo) / (hi - lo) * 26).toFixed(1)).join("");
+  return `<svg class="spark" viewBox="0 0 110 34" aria-hidden="true"><path d="${d}" fill="none" stroke="${color(r)}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+}
+function releases(r) {
+  const by = {};
+  for (const a of ASSETS.filter(a => a.repo === r)) {
+    const k = a.release, n = (+a.last) + (+a.banked);
+    (by[k] ||= { tag: k, n: 0, files: [] }).n += n;
+    by[k].files.push(`${a.name} (${fmt(n)})`);
+  }
+  return Object.values(by).sort((a, b) => b.n - a.n);
+}
+function renderRepos() {
+  const span = state.range ? state.range * DAY : latest.t - first.t;
+  const label = state.range ? { 1: "24h", 7: "7d", 30: "30d" }[state.range] : "all time";
+  let list = repos.filter(r => r.toLowerCase().includes(state.q)).map(r => ({ r, n: val(latest, r), g: gainSince(span, r) }));
+  list.sort(state.sort === "name" ? (a, b) => a.r.localeCompare(b.r) : state.sort === "day" ? (a, b) => b.g - a.g || b.n - a.n : (a, b) => b.n - a.n);
+  const wrap = $("repos");
+  wrap.replaceChildren();
+  if (!list.length) { wrap.innerHTML = `<div class="empty">${repos.length ? `No repos match “${esc(state.q)}”` : "No release downloads yet. Attach files to a GitHub release and they'll show up here."}</div>`; return; }
+  for (const { r, n, g } of list) {
+    const card = document.createElement("article");
+    card.className = "repo" + (state.open === r ? " open" : "");
+    const share = total ? n / total * 100 : 0;
+    card.innerHTML = `
+      <button aria-expanded="${state.open === r}">
+        <div class="top"><span class="sw" style="background:${color(r)}"></span><span class="name">${esc(r)}</span>
+          <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+        <div class="mid"><span class="total num">${fmt(n)}</span><span class="badge num ${g > 0 ? "up" : ""}" title="Gained in the last ${label}">${signed(g)} · ${label}</span>${spark(r)}</div>
+        <div class="bar"><i style="width:${share}%;background:${color(r)}"></i></div>
+        <div class="share"><span>${share.toFixed(1)}% of all downloads</span><span>${releases(r).length} releases</span></div>
+      </button>
+      <div class="detail">
+        <div class="detail-actions">
+          <button class="btn" data-act="focus">Show in chart</button>
+          <a class="btn" href="https://github.com/${USER}/${encodeURIComponent(r)}/releases" target="_blank" rel="noopener">Releases on GitHub ↗</a>
+        </div>
+        <table><thead><tr><th>Release</th><th>Downloads</th><th>Share</th></tr></thead><tbody>
+        ${releases(r).map(x => `<tr><td>${esc(x.tag)}<div class="files">${esc(x.files.join(" · "))}</div></td><td class="num">${fmt(x.n)}</td><td class="num">${n ? (x.n / n * 100).toFixed(0) : 0}%</td></tr>`).join("")}
+        </tbody></table>
+        <div class="note">Includes downloads of files that were since deleted or re-uploaded.</div>
+      </div>`;
+    card.querySelector("button").onclick = () => { state.open = state.open === r ? null : r; renderRepos(); };
+    card.querySelector("[data-act=focus]").onclick = () => { setFocus(r); $("chart").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" }); };
+    wrap.append(card);
+  }
+}
+
+let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => latest && draw(), 100); });
+
+// ---- links open in the default browser, not inside the app ----
+document.addEventListener("click", e => {
+  const a = e.target.closest("a[href^='http']"); if (!a) return;
+  e.preventDefault();
+  const opener = window.__TAURI__?.opener;
+  opener ? opener.openUrl(a.href) : window.open(a.href, "_blank", "noopener");
+});
+
+// ---- setup / settings ----
+async function userExists(name) {
+  try { await gh(`users/${encodeURIComponent(name)}`); return true; }
+  catch (e) { if (e.status === 404) return false; throw e; }
+}
+async function start() {
+  USER = cfg.user;
+  $("setup").style.display = "none"; $("app").hidden = false;
+  banner("Loading…", true);
+  await load();
+  banner("");
+  if (DATA.length) render();
+  // Local mode tracks on its own schedule; cloud mode gets a live point on top of the hourly history
+  if (MODE === "local" || Date.now() - liveAt > 20 * 6e4) await checkNow();
+}
+$("setup-form").onsubmit = async e => {
+  e.preventDefault();
+  const name = $("setup-user").value.trim().replace(/^@/, ""), err = $("setup-err"), go = $("setup-go");
+  go.disabled = true; err.textContent = "";
+  try {
+    if (!(await userExists(name))) { err.textContent = `No GitHub account named “${name}”.`; return; }
+    cfg.user = name; await start();
+  } catch (x) { err.textContent = x.message || "Couldn't reach GitHub. Check your connection."; }
+  finally { go.disabled = false; }
+};
+$("check").onclick = checkNow;
+$("open-settings").onclick = () => {
+  $("set-user").value = cfg.user; $("set-repo").value = store.get("repo") || ""; $("set-token").value = cfg.token;
+  const auto = window.__TAURI__?.autostart;
+  $("autostart-row").hidden = !auto;
+  if (auto) auto.isEnabled().then(on => $("set-autostart").checked = on).catch(() => {});
+  $("settings").showModal();
+};
+$("settings").onclose = async () => {
+  if ($("settings").returnValue !== "save") return;
+  const auto = window.__TAURI__?.autostart;
+  if (auto) try { $("set-autostart").checked ? await auto.enable() : await auto.disable(); } catch {}
+  const name = $("set-user").value.trim().replace(/^@/, "");
+  cfg.repo = $("set-repo").value.trim(); cfg.token = $("set-token").value.trim();
+  if (name && name.toLowerCase() !== cfg.user.toLowerCase()) {
+    try { if (!(await userExists(name))) return banner(`No GitHub account named “${name}”.`); }
+    catch (x) { return banner(x.message); }
+    cfg.user = name; liveAt = 0;
+    for (const el of document.querySelectorAll("[data-v]")) delete el.dataset.v;
+  }
+  state.focus = null; state.open = null; liveAt = 0;
+  await start();
+};
+
+// Refresh: cloud history every 10 min, live counts every 20 min (local mode saves each one, so it's the hourly-or-better tracker)
+setInterval(async () => {
+  if (!USER || document.hidden && MODE === "cloud") return;
+  if (MODE === "cloud") { try { const keep = DATA.filter(r => r.live); if (await loadCloud()) { DATA = DATA.concat(keep.filter(r => +new Date(r.time) > +new Date(DATA[DATA.length - 1].time))); render(); } } catch {} }
+  if (Date.now() - liveAt > 20 * 6e4) checkNow();
+}, 10 * 6e4);
+
+if (cfg.user) start(); else { $("setup").style.display = "grid"; $("setup-user").focus(); }
+</script>
+</body>
+</html>

@@ -6,7 +6,23 @@ GitHub resets a file's download count whenever you delete or re-upload a release
 
 **Example:** https://josiahg2502-glitch.github.io/github-download-tracker/
 
-## Track your own account
+## Windows app
+
+Download **GitHub Downloads** from [Releases](https://github.com/josiahg2502-glitch/github-download-tracker/releases/latest), install it and enter your GitHub username. You don't need an account setup or a token.
+
+- **If you've set up the cloud tracker** below, the app loads its full history and adds live counts on top. Click **Check now** at any time to fetch the latest numbers.
+- **If you haven't**, the app does the tracking itself on your PC. It checks every 20 minutes while it's running.
+- Closing the window keeps the app running in the system tray. Turn on **Start with Windows** in Settings so it keeps tracking after you restart.
+- The app has the same charts as the website, plus a card for each repo that breaks its downloads down by release.
+
+To build the app yourself, you need [Rust](https://rustup.rs) and Node.js. Run this in `app/`:
+
+```
+npm install
+npm run build
+```
+
+## Cloud tracker: track your own account with the website
 
 1. Click **Use this template → Create a new repository**. Name it anything and make it **public**, because GitHub Pages is free only for public repos.
 2. In the new repo, go to **Actions**, choose **Track downloads**, then click **Run workflow**. The first run takes about a minute and creates the `gh-pages` branch.
