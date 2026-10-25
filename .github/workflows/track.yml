@@ -1,0 +1,38 @@
+name: Track downloads
+
+on:
+  schedule:
+    - cron: "7 * * * *" # hourly; off the hour because GitHub delays :00 runs
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency: track
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      # Data lives on the gh-pages branch so copies of this template start with a clean history
+      - name: Check out data branch
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git fetch --depth=1 origin gh-pages:refs/remotes/origin/gh-pages; then
+            git worktree add -B gh-pages site origin/gh-pages
+          else
+            git worktree add --orphan -b gh-pages site
+          fi
+      - name: Check download counts
+        shell: pwsh
+        run: ./track-downloads.ps1 -Dir site
+      - name: Save results
+        working-directory: site
+        run: |
+          git add downloads.csv assets.csv index.html
+          git commit -m "Update download counts" || exit 0
+          git push origin gh-pages
